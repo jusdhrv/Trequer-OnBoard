@@ -1,10 +1,10 @@
 const int trigPin = 12;  // Trig pin (Ultrasonic)
 const int echoPin = 13;  // Echo pin (Ultrasonic)
-const int irPin = 14; // IR Pin
-const int ldrPin = 23; // LDR Pin
+const int irPin = 11; // IR Pin
+const int ldrPin = 9; // LDR Pin
 const int mqPin = A3; // MQ4 Pin
 
-const int dhtPin = 27;
+const int dhtPin = 10;
 #include "DHT.h"
 #define DHTTYPE DHT11 // DHT 11
 DHT dht(dhtPin, DHTTYPE);
@@ -52,20 +52,16 @@ void loop() {
   // Serial.println("----------------------------------");
 
   // Detect if obstacle present
+
+  // Serial.print("Obstacle at distance (cm): ");
   distanceUltrasonic = getUltrasonic();
+  Serial.print(distanceUltrasonic);
+  Serial.print("|");
+
+  // Serial.print("Obstacle detected: ");
   distanceIR = digitalRead(irPin);
-
-  if (distanceUltrasonic <= safetyDistance) {
-    // Serial.print("Obstacle at distance (cm): ");
-    Serial.print(distanceUltrasonic);
-    Serial.print("|");
-  }
-
-  if (distanceIR == LOW) {
-    // Serial.println("Obstacle detected");
-    Serial.print(distanceIR);
-    Serial.print("|");
-  }
+  Serial.print(distanceIR);
+  Serial.print("|");
 
   // Display the light intensity in the environment
   lightIntensity = digitalRead(ldrPin);
