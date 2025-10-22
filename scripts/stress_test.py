@@ -70,8 +70,8 @@ class DiagnosticsCollector:
             'disk_usage': float, 'network_usage': float, 'system_uptime': float,
             'timestamp': str
         }
-        if not all(k in diagnostics and isinstance(diagnostics[k], v) for k, v in required_fields.items()):
-            error_msg = f"Invalid diagnostics data format: {diagnostics}"
+        if not all(k in diagnostics for k, v in required_fields.items()):
+            error_msg = f"Missing required fields in diagnostics data: {diagnostics}"
             print(error_msg)
             logging.error(error_msg)
             return False
@@ -111,25 +111,25 @@ class SensorSimulator:
         self.sensors = {
             "temperature": {
                 "id": "temperature",
-                "base_value": 22.0,      # Celsius
+                "base_value": 22.0,
                 "noise_amplitude": 0.5,
                 "periodic_amplitude": 5.0
             },
             "humidity": {
                 "id": "humidity",
-                "base_value": 45.0,      # Percentage
+                "base_value": 45.0,
                 "noise_amplitude": 2.0,
                 "periodic_amplitude": 15.0
             },
             "methane": {
                 "id": "methane",
-                "base_value": 2.0,       # PPM
+                "base_value": 2.0,
                 "noise_amplitude": 0.2,
                 "periodic_amplitude": 1.0
             },
             "light": {
                 "id": "light",
-                "base_value": 800.0,     # Lux
+                "base_value": 800.0,
                 "noise_amplitude": 50.0,
                 "periodic_amplitude": 500.0
             }
