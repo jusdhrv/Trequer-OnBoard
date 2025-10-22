@@ -35,7 +35,7 @@ class DiagnosticsCollector:
             net_new = psutil.net_io_counters()
             network_usage = (net_new.bytes_sent + net_new.bytes_recv - net.bytes_sent - net.bytes_recv)
             system_uptime = time.time() - psutil.boot_time()
-            return {
+            diagnostics = {
                 "cpu_usage": round(cpu_usage, 2),
                 "cpu_temperature": round(cpu_temperature, 2),
                 "memory_usage": round(memory_usage, 2),
@@ -44,6 +44,8 @@ class DiagnosticsCollector:
                 "system_uptime": round(system_uptime, 2),
                 "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
             }
+            logging.info(f"Collected diagnostics: {diagnostics}")
+            return diagnostics
         except Exception as e:
             error_msg = f"Error collecting diagnostics: {e}"
             print(error_msg)
@@ -51,6 +53,7 @@ class DiagnosticsCollector:
             return None
 
     def send_diagnostics(self):
+        """Send diagnostic readings to the API"""
         diagnostics = self.collect_diagnostics()
         if not diagnostics:
             logging.error("No diagnostics data to send")
@@ -60,8 +63,8 @@ class DiagnosticsCollector:
             'disk_usage': float, 'network_usage': float, 'system_uptime': float,
             'timestamp': str
         }
-        if not all(k in diagnostics and isinstance(diagnostics[k], v) for k, v in required_fields.items()):
-            error_msg = f"Invalid diagnostics data format: {diagnostics}"
+        if not all(k in diagnostics for k, v in required_fields.items()):
+            error_msg = f"Missing required fields in diagnostics data: {diagnostics}"
             print(error_msg)
             logging.error(error_msg)
             return False
@@ -69,9 +72,9 @@ class DiagnosticsCollector:
         for attempt in range(retries):
             try:
                 headers = {'Authorization': 'Bearer YOUR_API_KEY'}  # Replace with actual API key if required
-                response = requests.post(self.api_endpoint, json=[diagnostics], headers=headers, timeout=5)
+                response = requests.post(self.api_endpoint, json=diagnostics, headers=headers, timeout=5)
                 if response.status_code == 200:
-                    logging.info("Successfully sent diagnostics data")
+                    logging.info(f"Successfully sent diagnostics data: {diagnostics}")
                     return True
                 else:
                     error_msg = f"Error sending diagnostics: {response.status_code} - {response.text}"
